@@ -16,7 +16,7 @@ default_bucket = Sys.getenv('WORKSPACE_BUCKET')
 default_directory = ''
 
 README <- function()
-    print("
+    cat("
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ README: How to use gcr_data_storage?~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  
 gcr_data_storage lets you easily move data between your development environment (e.g. Jupyter Notebook) and your Google Cloud Workspace bucket. 
@@ -34,13 +34,15 @@ gcr_data_storage was originally written to be used within the All of Us Research
 
     ```
     # Example code
-    source(url('https://github.com/AymoneKouame/r-google-cloud-data-storage/gcr_data_storage.r'))
+    library(devtools)
+    source_url('https://raw.github.com/AymoneKouame/r-google-cloud-data-storage/main/gcr_data_storage.r')
 
     ## list data in the bucket root directory 
     list_saved_data()
     ```
 More information, including examples, at https://github.com/AymoneKouame/r-google-cloud-data-storage/ .
     ")
+        
                     
 save_data_to_bucket <- function(data
                                 , filename
