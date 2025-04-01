@@ -12,8 +12,8 @@ library(imager)
 library(ggplotify)
 
 ###########
-def_bucket = Sys.getenv('WORKSPACE_BUCKET')
-def_dir = ''
+default_bucket = Sys.getenv('WORKSPACE_BUCKET')
+default_directory = ''
 
 README <- function()
     print("
@@ -53,8 +53,8 @@ save_data_to_bucket <- function(data
                                 , limitsize = TRUE
                                 , bucket =NULL){
     
-    if (is.null(directory)== TRUE){directory = def_dir}
-    if (is.null(bucket)== TRUE){bucket = def_bucket}
+    if (is.null(directory)== TRUE){directory = default_directory}
+    if (is.null(bucket)== TRUE){bucket = default_bucket}
     
     print(str_glue("
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Saving data ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -87,7 +87,9 @@ read_data_from_bucket<- function(filename
                                  , directory= NULL
                                  , save_copy_in_disk = TRUE){
     
-
+    if (is.null(directory)== TRUE){directory = default_directory}
+    if (is.null(bucket)== TRUE){bucket = default_bucket}
+    
     print(str_glue("
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Reading data ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 From location =  '{bucket}/{directory}'
@@ -113,23 +115,22 @@ From location =  '{bucket}/{directory}'
     return(data)
 }
 
-copy_from_bucket_to_bucket<- function(
-                                    origin_filename
-                                   , destination_bucket
-                                   , origin_bucket = NULL
-                                   , origin_directory = NULL
-                                   , destination_directory = NULL
-                                   , destination_filename = NULL
-                                   ){
-        
-        if (destination_filename == NULL){destination_filename = origin_filename}
-        if (origin_bucket == NULL){origin_bucket = def_bucket}
-        if (origin_directory == NULL){origin_directory = def_dir}
-        if (destination_directory ==NULL){destination_directory = def_dir}
+copy_from_bucket_to_bucket<- function(origin_filename
+                                       , destination_bucket
+                                       , origin_bucket = NULL
+                                       , origin_directory = NULL
+                                       , destination_directory = NULL
+                                       , destination_filename = NULL
+                                       ){
+
+        if (is.null(destination_filename)==TRUE){destination_filename = origin_filename}
+        if (is.null(origin_bucket)==TRUE){origin_bucket = default_bucket}
+        if (is.null(origin_directory)==TRUE){origin_directory = default_directory}
+        if (is.null(destination_directory)==TRUE){destination_directory = default_directory}
        
         origin_fullfilename = gsub('//','/', str_glue("{origin_bucket}/{origin_directory}/{origin_filename}"))
         origin_fullfilename = gsub('gs:/','gs://',origin_fullfilename)
-                                   
+    
         dest_fullfilename = gsub('//','/', str_glue("{destination_bucket}/{destination_directory}/{destination_filename}"))
         dest_fullfilename = gsub('gs:/','gs://', dest_fullfilename)                                   
 
@@ -140,6 +141,8 @@ copy_from_bucket_to_bucket<- function(
         "))
     
      res <- system(str_glue("gsutil cp {origin_fullfilename} {dest_fullfilename}"), intern= F)
+    
+     if (res ==1){print('Data successfully copied.')}
 
     }
 
@@ -153,7 +156,8 @@ list_saved_data<- function(bucket_or_disk = 'bucket'
     ")
     
     if (tolower(bucket_or_disk) %in% c('bucket','')){
-        if (is.null(directory) == TRUE){directory = def_dir}
+        if (is.null(directory) == TRUE){directory = default_directory}
+        if (is.null(bucket)== TRUE){bucket = default_bucket}
         location = gsub('//', '/', str_glue("{bucket}/{directory}/{pattern}"))
         location = gsub('gs:/', 'gs://', location)
         print(str_glue('In {location}\n'))
